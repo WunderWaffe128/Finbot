@@ -80,4 +80,5 @@ if __name__ == "__main__":
     app.run_polling()
 
 
+
 """await update.message.reply_text("❌ Такой команды нету! Нажмите на кнопку или /start")"""
