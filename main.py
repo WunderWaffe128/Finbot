@@ -8,6 +8,22 @@ BOT_TOKEN = ""
 currency_keyboard = [["💰Расчет валюты"]]
 currency_keyboard = ReplyKeyboardMarkup(currency_keyboard, resize_keyboard=True)
 
+def get_rus():
+    try :
+        url = "https://belarusbank.by/api/kursExchange"
+        response = requests.get(url)
+        print(f"✅ Статус ответа : {response.status_code}")
+        if response.status_code == 200:
+            print("✅ Сайт доступен !")
+            date = response.json()
+            bank = date[0]
+            rub_rate = float(bank["RUB_out"])
+            return rub_rate
+        else:
+            print("❌ Сайт не доступен")
+    except Exception as e:
+        print(f"❌ Ошибка : {e}")
+
 def get_usd():
     try:
         url = "https://belarusbank.by/api/kursExchange"
