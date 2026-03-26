@@ -1,4 +1,3 @@
-# handlers.py
 from telegram import Update
 from telegram.ext import ContextTypes
 from api_client import get_currency_rate, get_all_rates
@@ -10,13 +9,20 @@ from config import (
     CURRENCY_MAPPING
 )
 
+# Функции для логирования (добавляем)
+def log_conversion(user_name, user_last_name, amount, result, currency_from, currency_to):
+    """Логирование конвертации"""
+    print(f"💰 КОНВЕРТАЦИЯ: {user_name} {user_last_name} | {amount:.2f} {currency_from} → {result:.2f} {currency_to}")
+
+def log_to_console(user, user_name, user_last_name, amount, result, currency_from, currency_to):
+    """Дополнительное логирование"""
+    print(f"📊 ДЕТАЛИ: Пользователь @{user.username or 'no_username'} | {currency_from} → {currency_to} | Сумма: {amount} | Результат: {result:.2f}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_name = update.message.from_user.first_name
     user_last_name = update.message.from_user.last_name
     print(f"✅ Команда /start получена! Пользователь {user_name} {user_last_name}")
 
-    # Инициализируем состояние пользователя
     context.user_data['state'] = 'main_menu'
 
     welcome_text = (
@@ -46,10 +52,8 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_last_name = update.message.from_user.last_name
     user = update.message.from_user
 
-    # Получаем текущее состояние пользователя
     current_state = context.user_data.get('state', 'main_menu')
 
-    # Обработка главного меню
     if text == "💰 Конвертация валюты":
         context.user_data['state'] = 'direction_selection'
         await update.message.reply_text(
@@ -90,7 +94,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=MAIN_KEYBOARD
         )
 
-    # Обработка возврата
     elif text == "🔙 Назад":
         if current_state == 'currency_selection':
             context.user_data['state'] = 'direction_selection'
@@ -108,7 +111,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=MAIN_KEYBOARD
             )
 
-    # Обработка выбора направления
     elif text == "🇧🇾 BYN → 💱 Иностранная":
         context.user_data['direction'] = 'byn_to_foreign'
         context.user_data['state'] = 'currency_selection'
@@ -125,7 +127,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=CURRENCY_KEYBOARD
         )
 
-    # Обработка выбора валюты
     elif text in CURRENCY_MAPPING:
         selected_currency = CURRENCY_MAPPING[text]
         direction = context.user_data.get('direction')
@@ -140,7 +141,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['selected_currency'] = selected_currency
         context.user_data['state'] = 'awaiting_amount'
 
-        # Получаем курс для отображения
         rate = get_currency_rate(selected_currency)
         rate_text = f"{rate:.2f}" if rate else "не доступен"
 
@@ -151,7 +151,7 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"Введите сумму в BYN для конвертации в {selected_currency}:",
                 reply_markup=BACK_KEYBOARD
             )
-        else:  # foreign_to_byn
+        else:
             await update.message.reply_text(
                 f"Вы выбрали: {text} → 🇧🇾 BYN\n"
                 f"💰 Текущий курс: 1 {selected_currency} = {rate_text} BYN\n\n"
@@ -159,7 +159,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=BACK_KEYBOARD
             )
 
-    # Обработка ввода суммы
     elif current_state == 'awaiting_amount' and context.user_data.get('selected_currency'):
         try:
             amount = float(text)
@@ -170,7 +169,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if rate:
                 if direction == 'byn_to_foreign':
-                    # BYN -> Иностранная (делим)
                     result = amount / rate
                     result_text = (
                         f"✅ Результат конвертации:\n\n"
@@ -181,7 +179,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     log_conversion(user_name, user_last_name, amount, result,
                                    currency_from="BYN", currency_to=selected_currency)
                 else:
-                    # Иностранная -> BYN (умножаем)
                     result = amount * rate
                     result_text = (
                         f"✅ Результат конвертации:\n\n"
@@ -201,10 +198,8 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                currency_from="BYN" if direction == 'byn_to_foreign' else selected_currency,
                                currency_to=selected_currency if direction == 'byn_to_foreign' else "BYN")
 
-                # Меняем состояние обратно на выбор валюты
                 context.user_data['state'] = 'currency_selection'
                 context.user_data.pop('selected_currency')
-                # Направление сохраняем для следующих конвертаций
 
             else:
                 await update.message.reply_text(
@@ -219,7 +214,6 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=BACK_KEYBOARD
             )
 
-    # Если команда не распознана
     else:
         await update.message.reply_text(
             "🤔 Я не понимаю эту команду.\n"
