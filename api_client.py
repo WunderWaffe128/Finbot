@@ -1,7 +1,7 @@
 # api_client.py
 import requests
 
-
+URL = "https://belarusbank.by/api/kursExchange"
 def get_currency_rate(currency_code="USD"):
     """
     Получение курса валюты от Беларусбанка
@@ -9,8 +9,7 @@ def get_currency_rate(currency_code="USD"):
     Возвращает: сколько BYN за 1 единицу иностранной валюты
     """
     try:
-        url = "https://belarusbank.by/api/kursExchange"
-        response = requests.get(url, timeout=10)
+        response = requests.get(URL, timeout=10)
         print(f"✅ Статус ответа для {currency_code}: {response.status_code}")
 
         if response.status_code == 200:
