@@ -1,10 +1,8 @@
-
 import os
-import json
+import threading
 import logging
 from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from config import BOT_TOKEN
 from handlers import start, handle_number
@@ -16,39 +14,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Глобальная переменная для приложения
-app = None
 
-
-class WebhookHandler(BaseHTTPRequestHandler):
-    """Обрабатывает вебхуки от Telegram и healthcheck запросы"""
-
-    def do_POST(self):
-        """Telegram отправляет сюда обновления"""
-        if self.path == '/webhook':
-            try:
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                update_data = json.loads(post_data)
-
-                # Создаем объект Update и добавляем в очередь
-                update = Update.de_json(update_data, app.bot)
-                app.update_queue.put_nowait(update)
-
-                self.send_response(200)
-                self.end_headers()
-                self.wfile.write(b'OK')
-                logger.debug("Webhook received")
-            except Exception as e:
-                logger.error(f"Webhook error: {e}")
-                self.send_response(500)
-                self.end_headers()
-        else:
-            self.send_response(404)
-            self.end_headers()
-
+# ===== HEALTHCHECK СЕРВЕР =====
+class HealthHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        """Healthcheck для Render и UptimeRobot"""
         if self.path == '/healthcheck' or self.path == '/':
             self.send_response(200)
             self.end_headers()
@@ -58,7 +27,6 @@ class WebhookHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_HEAD(self):
-        """Поддержка HEAD для UptimeRobot"""
         if self.path == '/healthcheck' or self.path == '/':
             self.send_response(200)
             self.end_headers()
@@ -67,59 +35,33 @@ class WebhookHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def log_message(self, format, *args):
-        """Отключаем стандартное логирование HTTP сервера"""
-        pass
+        pass  # отключаем логи
 
+
+def run_health_server():
+    port = int(os.getenv('PORT', 10000))
+    server = HTTPServer(('0.0.0.0', port), HealthHandler)
+    server.serve_forever()
+
+
+# Запускаем healthcheck в фоне
+threading.Thread(target=run_health_server, daemon=True).start()
+
+
+# =================================
 
 def main():
-    global app
+    logger.info(f"🚀 Запускаю бота версия: beta2.{datetime.now()}")
 
-    logger.info(f"🚀 Запускаю бота версия: beta1. {datetime.now()}")
 
-    # Создаем приложение
-    app = Application.builder().token(BOT_TOKEN).updater(None).build()
-
-    # Добавляем обработчики команд
+    app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_number))
 
-    # Получаем URL сервера
-    port = int(os.getenv('PORT', 10000))
-    render_url = os.getenv('RENDER_EXTERNAL_URL', f'https://finbot-j90j.onrender.com')
-    webhook_url = f"{render_url}/webhook"
+    logger.info("✅ Бот запущен! Ожидаю сообщения...")
 
-    logger.info(f"Устанавливаю вебхук: {webhook_url}")
-
-    # Устанавливаем вебхук
-    app.bot.set_webhook(
-        url=webhook_url,
-        allowed_updates=Update.ALL_TYPES,
-        drop_pending_updates=True
-    )
-
-    logger.info(f"✅ Вебхук установлен! Бот готов принимать сообщения")
-
-    # Запускаем HTTP сервер
-    server = HTTPServer(('0.0.0.0', port), WebhookHandler)
-    logger.info(f"🌐 HTTP сервер запущен на порту {port}")
-
-    # Запускаем асинхронную обработку
-    import asyncio
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    async def run_app():
-        async with app:
-            await app.start()
-            logger.info("✅ Бот полностью запущен и ожидает сообщения!")
-            await server.serve_forever()
-
-    try:
-        loop.run_until_complete(run_app())
-    except KeyboardInterrupt:
-        logger.info("Бот остановлен")
-    finally:
-        loop.close()
+    # Запускаем polling
+    app.run_polling()
 
 
 if __name__ == "__main__":
