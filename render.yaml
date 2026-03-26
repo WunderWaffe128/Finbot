@@ -1,8 +1,7 @@
 services:
   - type: web
-    name: your-telegram-bot
+    name: finbot
     runtime: python
-    buildCommand: pip install -r requirements.txt
     startCommand: python main.py
     envVars:
       - key: BOT_TOKEN
