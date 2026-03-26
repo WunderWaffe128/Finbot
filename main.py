@@ -1,8 +1,34 @@
-# main.py
+import os
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from config import BOT_TOKEN
 from handlers import start, handle_number
 
+
+# ===== ПРОСТОЙ HEALTHCHECK СЕРВЕР (без Flask) =====
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+    def log_message(self, format, *args):
+        # Отключаем логи healthcheck
+        pass
+
+
+def run_health_server():
+    port = int(os.getenv('PORT', 8000))
+    server = HTTPServer(('0.0.0.0', port), HealthHandler)
+    server.serve_forever()
+
+
+# Запускаем healthcheck сервер в фоновом потоке
+threading.Thread(target=run_health_server, daemon=True).start()
+
+
+# ===== КОНЕЦ =====
 
 def main():
     """Главная функция для запуска бота"""

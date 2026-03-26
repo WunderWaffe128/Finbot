@@ -1,15 +1,5 @@
-import os
-from dotenv import load_dotenv
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 
-load_dotenv()
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN не найден! Добавьте его в переменные окружения")
-
-# ===== КЛАВИАТУРЫ =====
 # Создаем отдельные кнопки
 button_convert = KeyboardButton("💰 Конвертация валюты")
 button_rates = KeyboardButton("📊 Все курсы")
