@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 import logging
@@ -72,7 +73,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
 def main():
     global app
 
-    logger.info("🚀 Запускаю бота на вебхуках...")
+    logger.info("🚀 Запускаю бота версия: beta1." + datetime.now())
 
     # Создаем приложение
     app = Application.builder().token(BOT_TOKEN).updater(None).build()
