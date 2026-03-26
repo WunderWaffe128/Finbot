@@ -1,7 +1,8 @@
-import datetime
+
 import os
 import json
 import logging
+from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
@@ -73,7 +74,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
 def main():
     global app
 
-    logger.info("🚀 Запускаю бота версия: beta1." + datetime.now())
+    logger.info(f"🚀 Запускаю бота версия: beta1. {datetime.now()}")
 
     # Создаем приложение
     app = Application.builder().token(BOT_TOKEN).updater(None).build()

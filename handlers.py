@@ -2,7 +2,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from api_client import get_currency_rate, get_all_rates
-from logger import log_conversion, log_to_console
 from config import (
     MAIN_KEYBOARD,
     DIRECTION_KEYBOARD,
