@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from api_client import get_currency_rate, get_all_rates
-from config import (
+from src.api_client import get_currency_rate, get_all_rates
+from src.config import (
     MAIN_KEYBOARD,
     DIRECTION_KEYBOARD,
     CURRENCY_KEYBOARD,

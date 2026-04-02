@@ -4,8 +4,8 @@ import logging
 from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
-from config import BOT_TOKEN
-from handlers import start, handle_number
+from src.config import BOT_TOKEN
+from src.handlers import start, handle_number
 
 # Настройка логирования
 logging.basicConfig(
