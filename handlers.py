@@ -1,229 +1,204 @@
 # handlers.py
 from telegram import Update
 from telegram.ext import ContextTypes
-from api_client import get_currency_rate, get_all_rates
+from api_client import get_real_bank_rates, get_best_rates_summary, predict_future_rates
 from logger import log_conversion, log_to_console
-from config import (
-    MAIN_KEYBOARD,
-    DIRECTION_KEYBOARD,
-    CURRENCY_KEYBOARD,
-    BACK_KEYBOARD,
-    CURRENCY_MAPPING
+from db_manager import save_user_setting, get_user_data
+
+# ПРАВИЛЬНЫЙ ИМПОРТ НАСТРОЕК
+from bot_config import CURRENCY_MAPPING, CITIES_MAPPING
+
+# ПРАВИЛЬНЫЙ ИМПОРТ КЛАВИАТУР (раньше тут была ошибка!)
+from keyboards import (
+    MAIN_KEYBOARD, DIRECTION_KEYBOARD, CURRENCY_KEYBOARD,
+    BACK_KEYBOARD, CITY_KEYBOARD, TIME_KEYBOARD
 )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_name = update.message.from_user.first_name
-    user_last_name = update.message.from_user.last_name
-    print(f"✅ Команда /start получена! Пользователь {user_name} {user_last_name}")
-
-    # Инициализируем состояние пользователя
+    user = update.message.from_user
+    save_user_setting(user.id, city_slug="minsk", time_pref="09:00")
     context.user_data['state'] = 'main_menu'
 
     welcome_text = (
-        f"👋 Привет, {user_name} {user_last_name if user_last_name else ''}!\n\n"
-        f"Я бот для конвертации валют Беларусь Банк 💰\n\n"
-        f"📌 Доступны два режима конвертации:\n"
-        f"1️⃣ 🇧🇾 BYN → 💱 Иностранная валюта\n"
-        f"2️⃣ 💱 Иностранная валюта → 🇧🇾 BYN\n\n"
-        f"Доступные валюты:\n"
-        f"🇺🇸 USD - Доллар США\n"
-        f"🇪🇺 EUR - Евро\n"
-        f"🇷🇺 RUB - Российский рубль\n"
-        f"🇨🇳 CNY - Китайский юань\n\n"
-        f"Выберите действие в меню ниже:"
+        f"👋 Привет, {user.first_name}!\n\n"
+        f"Я агрегатор реальных курсов валют в банках Беларуси 💰\n\n"
+        f"🏙️ Твой город: **Минск**\n"
+        f"⏰ Время рассылки: **09:00**\n\n"
+        f"✨ *Новая фича:* Теперь я умею анализировать рынок и делать прогнозы курсов!\n\n"
+        f"Используй меню ниже:"
     )
-
-    await update.message.reply_text(
-        welcome_text,
-        reply_markup=MAIN_KEYBOARD
-    )
+    await update.message.reply_text(welcome_text, reply_markup=MAIN_KEYBOARD, parse_mode="Markdown")
 
 
 async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Обработчик текстовых сообщений"""
     text = update.message.text
-    user_name = update.message.from_user.first_name
-    user_last_name = update.message.from_user.last_name
     user = update.message.from_user
-
-    # Получаем текущее состояние пользователя
+    user_name = user.first_name
+    user_last_name = user.last_name or ""
     current_state = context.user_data.get('state', 'main_menu')
 
-    # Обработка главного меню
+    u_data = get_user_data(user.id)
+    city_slug, city_time = u_data["city"], u_data["time"]
+    city_name_ru = next((k for k, v in CITIES_MAPPING.items() if v == city_slug), "Минск")
+
+    # 1. ГЛАВНОЕ МЕНЮ
     if text == "💰 Конвертация валюты":
         context.user_data['state'] = 'direction_selection'
-        await update.message.reply_text(
-            "Выберите направление конвертации:",
-            reply_markup=DIRECTION_KEYBOARD
-        )
+        await update.message.reply_text("Выберите направление:", reply_markup=DIRECTION_KEYBOARD)
+        return
 
-    elif text == "📊 Все курсы":
-        rates = get_all_rates()
-        if rates:
-            message = "📊 Текущие курсы валют (Беларусь Банк):\n\n"
-            for currency, rate in rates.items():
-                flag = "🇺🇸" if currency == "USD" else "🇪🇺" if currency == "EUR" else "🇷🇺" if currency == "RUB" else "🇨🇳"
-                message += f"{flag} 1 {currency} = {rate:.2f} BYN\n"
-        else:
-            message = "❌ Не удалось получить курсы валют"
+    elif text == "🏙️ Выбор города":
+        context.user_data['state'] = 'city_selection'
+        await update.message.reply_text(f"📍 Твой текущий город: **{city_name_ru}**\nВыбери новый:",
+                                        reply_markup=CITY_KEYBOARD)
+        return
 
-        await update.message.reply_text(
-            message,
-            reply_markup=MAIN_KEYBOARD
-        )
+    elif text == "⏰ Время рассылки":
+        context.user_data['state'] = 'time_selection'
+        status = f"**{city_time}**" if city_time != "off" else "**Отключена**"
+        await update.message.reply_text(f"⏰ Текущее время рассылки: {status}\nВыбери новое:",
+                                        reply_markup=TIME_KEYBOARD, parse_mode="Markdown")
+        return
 
-    elif text == "❓ Помощь":
-        help_text = (
-            "📚 Как пользоваться ботом:\n\n"
-            "1️⃣ Нажмите '💰 Конвертация валюты'\n"
-            "2️⃣ Выберите направление:\n"
-            "   • 🇧🇾 BYN → 💱 (из рублей в иностранную)\n"
-            "   • 💱 → 🇧🇾 BYN (из иностранной в рубли)\n"
-            "3️⃣ Выберите валюту\n"
-            "4️⃣ Введите сумму\n"
-            "5️⃣ Получите результат!\n\n"
-            "📊 'Все курсы' - показать все текущие курсы\n"
-            "🔙 'Назад' - вернуться в предыдущее меню"
-        )
-        await update.message.reply_text(
-            help_text,
-            reply_markup=MAIN_KEYBOARD
-        )
+    # === БЛОК ТВОЕЙ МЕЧТЫ: ПРОГНОЗ ===
+    elif text == "🔮 Прогноз курса":
+        await update.message.reply_text("🔄 Анализирую исторические данные за 30 дней и считаю тренд...")
+        predictions = predict_future_rates()
 
-    # Обработка возврата
-    elif text == "🔙 Назад":
-        if current_state == 'currency_selection':
-            context.user_data['state'] = 'direction_selection'
-            await update.message.reply_text(
-                "Выберите направление конвертации:",
-                reply_markup=DIRECTION_KEYBOARD
-            )
-        else:
-            context.user_data['state'] = 'main_menu'
-            context.user_data.pop('direction', None)
-            context.user_data.pop('selected_currency', None)
-            context.user_data.pop('awaiting_amount', None)
-            await update.message.reply_text(
-                "Главное меню:",
-                reply_markup=MAIN_KEYBOARD
-            )
-
-    # Обработка выбора направления
-    elif text == "🇧🇾 BYN → 💱 Иностранная":
-        context.user_data['direction'] = 'byn_to_foreign'
-        context.user_data['state'] = 'currency_selection'
-        await update.message.reply_text(
-            "Выберите валюту для конвертации из BYN:",
-            reply_markup=CURRENCY_KEYBOARD
-        )
-
-    elif text == "💱 Иностранная → 🇧🇾 BYN":
-        context.user_data['direction'] = 'foreign_to_byn'
-        context.user_data['state'] = 'currency_selection'
-        await update.message.reply_text(
-            "Выберите валюту для конвертации в BYN:",
-            reply_markup=CURRENCY_KEYBOARD
-        )
-
-    # Обработка выбора валюты
-    elif text in CURRENCY_MAPPING:
-        selected_currency = CURRENCY_MAPPING[text]
-        direction = context.user_data.get('direction')
-
-        if not direction:
-            await update.message.reply_text(
-                "Сначала выберите направление конвертации!",
-                reply_markup=DIRECTION_KEYBOARD
-            )
+        if not predictions:
+            await update.message.reply_text("❌ Ошибка соединения с сервером исторических данных.",
+                                            reply_markup=MAIN_KEYBOARD)
             return
 
-        context.user_data['selected_currency'] = selected_currency
-        context.user_data['state'] = 'awaiting_amount'
+        msg = "🔮 **Аналитический прогноз курсов валют:**\n_Основано на математическом расчете динамики НБРБ за последние 30 дней_\n\n"
+        for cur, data in predictions.items():
+            unit = "100 " if cur == "RUB" else "10 " if cur == "CNY" else "1 "
+            sign = "+" if data['change'] > 0 else ""
+            msg += f"{data['icon']} **{unit}{cur}** (Сейчас: `{data['current']:.4f}`)\n"
+            msg += f"   • Через неделю: `{data['week']:.4f}` BYN ({sign}{data['change']:.4f})\n"
+            msg += f"   • Через месяц: `{data['month']:.4f}` BYN\n\n"
 
-        # Получаем курс для отображения
-        rate = get_currency_rate(selected_currency)
-        rate_text = f"{rate:.2f}" if rate else "не доступен"
+        msg += "⚠️ _Внимание: Рынок непредсказуем. Этот прогноз отражает математический тренд, а не финансовую рекомендацию._"
+        await update.message.reply_text(msg, reply_markup=MAIN_KEYBOARD, parse_mode="Markdown")
+        return
 
-        if direction == 'byn_to_foreign':
-            await update.message.reply_text(
-                f"Вы выбрали: 🇧🇾 BYN → {text}\n"
-                f"💰 Текущий курс: 1 {selected_currency} = {rate_text} BYN\n\n"
-                f"Введите сумму в BYN для конвертации в {selected_currency}:",
-                reply_markup=BACK_KEYBOARD
+    # === БЛОК ЧЕСТНЫХ КУРСОВ ===
+    elif text == "📊 Лучшие курсы банков":
+        await update.message.reply_text(f"🔄 Запрашиваю честные данные обменников для г. {city_name_ru}...")
+        data = get_best_rates_summary(city_slug)
+
+        if not data:
+            await update.message.reply_text("❌ Сервер агрегатора недоступен. Попробуй позже.",
+                                            reply_markup=MAIN_KEYBOARD)
+            return
+
+        msg = f"🏆 **ЛУЧШИЕ КУРСЫ В ОБМЕННИКАХ ({city_name_ru}):**\n"
+        for cur, info in data["best"].items():
+            unit = "100 " if cur == "RUB" else "10 " if cur == "CNY" else "1 "
+            msg += (
+                f"\n💵 **{unit}{cur}**\n"
+                f"🟢 Сдать дороже: `{info['best_buy']:.4f}` BYN ({info['best_buy_bank']})\n"
+                f"🔴 Купить дешевле: `{info['best_sell']:.4f}` BYN ({info['best_sell_bank']})\n"
             )
-        else:  # foreign_to_byn
-            await update.message.reply_text(
-                f"Вы выбрали: {text} → 🇧🇾 BYN\n"
-                f"💰 Текущий курс: 1 {selected_currency} = {rate_text} BYN\n\n"
-                f"Введите сумму в {selected_currency} для конвертации в BYN:",
-                reply_markup=BACK_KEYBOARD
-            )
+        await update.message.reply_text(msg, reply_markup=MAIN_KEYBOARD, parse_mode="Markdown")
+        return
 
-    # Обработка ввода суммы
-    elif current_state == 'awaiting_amount' and context.user_data.get('selected_currency'):
-        try:
-            amount = float(text)
-            selected_currency = context.user_data['selected_currency']
-            direction = context.user_data.get('direction')
-
-            rate = get_currency_rate(selected_currency)
-
-            if rate:
-                if direction == 'byn_to_foreign':
-                    # BYN -> Иностранная (делим)
-                    result = amount / rate
-                    result_text = (
-                        f"✅ Результат конвертации:\n\n"
-                        f"🇧🇾 {amount:.2f} BYN = {result:.2f} {selected_currency}\n"
-                        f"📈 Курс: 1 {selected_currency} = {rate:.2f} BYN\n\n"
-                        f"Что делаем дальше?"
-                    )
-                    log_conversion(user_name, user_last_name, amount, result,
-                                   currency_from="BYN", currency_to=selected_currency)
-                else:
-                    # Иностранная -> BYN (умножаем)
-                    result = amount * rate
-                    result_text = (
-                        f"✅ Результат конвертации:\n\n"
-                        f"{amount:.2f} {selected_currency} = 🇧🇾 {result:.2f} BYN\n"
-                        f"📈 Курс: 1 {selected_currency} = {rate:.2f} BYN\n\n"
-                        f"Что делаем дальше?"
-                    )
-                    log_conversion(user_name, user_last_name, amount, result,
-                                   currency_from=selected_currency, currency_to="BYN")
-
-                await update.message.reply_text(
-                    result_text,
-                    reply_markup=CURRENCY_KEYBOARD
-                )
-
-                log_to_console(user, user_name, user_last_name, amount, result,
-                               currency_from="BYN" if direction == 'byn_to_foreign' else selected_currency,
-                               currency_to=selected_currency if direction == 'byn_to_foreign' else "BYN")
-
-                # Меняем состояние обратно на выбор валюты
-                context.user_data['state'] = 'currency_selection'
-                context.user_data.pop('selected_currency')
-                # Направление сохраняем для следующих конвертаций
-
-            else:
-                await update.message.reply_text(
-                    f"❌ Не удалось получить курс для {selected_currency}",
-                    reply_markup=CURRENCY_KEYBOARD
-                )
-
-        except ValueError:
-            await update.message.reply_text(
-                f"❌ Пожалуйста, введите число!\n"
-                f"Пример: 100, 50.5, 1000",
-                reply_markup=BACK_KEYBOARD
-            )
-
-    # Если команда не распознана
-    else:
+    elif text == "❓ Помощь":
         await update.message.reply_text(
-            "🤔 Я не понимаю эту команду.\n"
-            "Используйте кнопки меню для навигации:",
-            reply_markup=MAIN_KEYBOARD
-        )
+            "Бот берет абсолютно реальные данные с рынка. Раздел «Прогноз» математически вычисляет будущую стоимость на основе истории НБРБ.",
+            reply_markup=MAIN_KEYBOARD)
+        return
+
+    elif text == "🔙 Назад":
+        context.user_data['state'] = 'main_menu'
+        await update.message.reply_text("Главное меню:", reply_markup=MAIN_KEYBOARD)
+        return
+
+    # 2. НАСТРОЙКИ ГОРОДА И ВРЕМЕНИ
+    if current_state == 'city_selection':
+        if text in CITIES_MAPPING:
+            save_user_setting(user.id, city_slug=CITIES_MAPPING[text])
+            context.user_data['state'] = 'main_menu'
+            await update.message.reply_text(f"✅ Город изменен на: **{text}**", reply_markup=MAIN_KEYBOARD,
+                                            parse_mode="Markdown")
+        return
+
+    if current_state == 'time_selection':
+        if text in ["07:00", "08:00", "09:00", "10:00", "11:00"]:
+            save_user_setting(user.id, time_pref=text)
+            context.user_data['state'] = 'main_menu'
+            await update.message.reply_text(f"✅ Время рассылки: **{text}**", reply_markup=MAIN_KEYBOARD,
+                                            parse_mode="Markdown")
+        elif text == "❌ Отключить рассылку":
+            save_user_setting(user.id, time_pref="off")
+            context.user_data['state'] = 'main_menu'
+            await update.message.reply_text("❌ Рассылка отключена.", reply_markup=MAIN_KEYBOARD)
+        return
+
+    # 3. ЛОГИКА КОНВЕРТАЦИИ
+    if current_state == 'direction_selection':
+        if text == "🇧🇾 BYN → 💱 Иностранная":
+            context.user_data['direction'], context.user_data['state'] = 'byn_to_foreign', 'currency_selection'
+            await update.message.reply_text("Выбери целевую валюту:", reply_markup=CURRENCY_KEYBOARD)
+        elif text == "💱 Иностранная → 🇧🇾 BYN":
+            context.user_data['direction'], context.user_data['state'] = 'foreign_to_byn', 'currency_selection'
+            await update.message.reply_text("Выбери продаваемую валюту:", reply_markup=CURRENCY_KEYBOARD)
+        return
+
+    if current_state == 'currency_selection':
+        if text in CURRENCY_MAPPING:
+            context.user_data['selected_currency'] = CURRENCY_MAPPING[text]
+            context.user_data['state'] = 'awaiting_amount'
+            unit_str = "BYN" if context.user_data['direction'] == 'byn_to_foreign' else CURRENCY_MAPPING[text]
+            await update.message.reply_text(f"Введите сумму в {unit_str}:", reply_markup=BACK_KEYBOARD)
+        return
+
+    if current_state == 'awaiting_amount':
+        try:
+            amount = float(text.replace(",", "."))
+            selected_currency = context.user_data['selected_currency']
+            direction = context.user_data['direction']
+
+            data = get_best_rates_summary(city_slug)
+
+            if not data:
+                await update.message.reply_text("❌ Сервер обмена недоступен.", reply_markup=MAIN_KEYBOARD)
+                context.user_data['state'] = 'main_menu'
+                return
+
+            best_info = data["best"][selected_currency]
+            scale = 100.0 if selected_currency == "RUB" else 10.0 if selected_currency == "CNY" else 1.0
+
+            if direction == 'byn_to_foreign':
+                rate = best_info["best_sell"]
+                bank_name = best_info["best_sell_bank"]
+                if rate > 0:
+                    result = (amount / rate) * scale
+                    res_text = (f"✅ {amount:.2f} BYN ≈ **{result:.2f} {selected_currency}**\n"
+                                f"🏆 По лучшему реальному курсу в г. {city_name_ru}\n"
+                                f"🏦 Банк: *{bank_name}* (Продажа: `{rate:.4f}` за {int(scale)} ед.)")
+                    log_conversion(user_name, user_last_name, amount, result, "BYN", selected_currency)
+                    log_to_console(user, user_name, user_last_name, amount, result, "BYN", selected_currency)
+                else:
+                    res_text = "❌ Нет доступных курсов."
+            else:
+                rate = best_info["best_buy"]
+                bank_name = best_info["best_buy_bank"]
+                if rate > 0:
+                    result = (amount / scale) * rate
+                    res_text = (f"✅ {amount:.2f} {selected_currency} ≈ **{result:.2f} BYN**\n"
+                                f"🏆 По лучшему реальному курсу в г. {city_name_ru}\n"
+                                f"🏦 Банк: *{bank_name}* (Покупка: `{rate:.4f}` за {int(scale)} ед.)")
+                    log_conversion(user_name, user_last_name, amount, result, selected_currency, "BYN")
+                    log_to_console(user, user_name, user_last_name, amount, result, selected_currency, "BYN")
+                else:
+                    res_text = "❌ Нет доступных курсов."
+
+            await update.message.reply_text(res_text, reply_markup=CURRENCY_KEYBOARD, parse_mode="Markdown")
+            context.user_data['state'] = 'currency_selection'
+        except ValueError:
+            await update.message.reply_text("❌ Введите корректное число!", reply_markup=BACK_KEYBOARD)
+        return
+
+    await update.message.reply_text("Используй кнопки меню:", reply_markup=MAIN_KEYBOARD)
