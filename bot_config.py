@@ -1,6 +1,6 @@
 # bot_config.py
 
-BOT_TOKEN = ""
+BOT_TOKEN = "8703308776:AAHgPyH9zKMDu2PZo5DPaNsqbRHEPuP4nrk"
 USERS_FILE = "users.txt"
 LOG_FILE = "bot.log.txt"
 
