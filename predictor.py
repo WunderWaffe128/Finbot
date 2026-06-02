@@ -1,205 +1,239 @@
 # predictor.py
-# Умный предсказатель курса валют для Беларуси.
-# Использует официальный API НБРБ (365 дней истории).
-# Методы: линейная регрессия + экспоненциальное сглаживание (EWM).
-# Горизонт: неделя / месяц / год / 5 лет.
-# Рекомендации к покупке и продаже строятся честно — по соотношению
-# текущего банковского курса к спрогнозированному.
-
 import requests
 import numpy as np
+import json
+import os
+import time
 from datetime import datetime, timedelta
 from typing import Optional
 
-
-# ID валют в системе НБРБ
-NBRB_IDS = {
-    "USD": 431,
-    "EUR": 451,
-    "RUB": 456,
-    "CNY": 462,
-}
-
-# Сколько единиц иностранной валюты соответствует одной котировке НБРБ
+NBRB_IDS = {"USD": 431, "EUR": 451, "RUB": 456, "CNY": 462}
 SCALE = {"USD": 1, "EUR": 1, "RUB": 100, "CNY": 10}
-
-
-def _fetch_nbrb_history(cur_id: int, days: int = 365) -> list[float] | None:
-    """Загружает исторические курсы НБРБ за `days` дней. Возвращает список float или None."""
-    end = datetime.now()
-    start = end - timedelta(days=days)
-    url = (
-        f"https://api.nbrb.by/exrates/rates/dynamics/{cur_id}"
-        f"?startdate={start.strftime('%Y-%m-%d')}&enddate={end.strftime('%Y-%m-%d')}"
-    )
-    try:
-        resp = requests.get(url, timeout=10)
-        if resp.status_code == 200:
-            data = resp.json()
-            if len(data) >= 30:
-                return [item["Cur_OfficialRate"] for item in data]
-    except Exception as e:
-        print(f"❌ НБРБ история: {e}")
-    return None
-
-
-def _linear_regression_forecast(rates: list[float], horizon_days: int) -> float:
-    """Линейная регрессия по всему ряду → прогноз на `horizon_days` вперёд."""
-    x = np.arange(len(rates), dtype=float)
-    y = np.array(rates, dtype=float)
-    # МНК вручную (быстрее sklearn для коротких рядов)
-    x_mean, y_mean = x.mean(), y.mean()
-    b = np.dot(x - x_mean, y - y_mean) / np.dot(x - x_mean, x - x_mean)
-    a = y_mean - b * x_mean
-    return float(a + b * (len(rates) - 1 + horizon_days))
-
-
-def _ewm_forecast(rates: list[float], horizon_days: int, alpha: float = 0.15) -> float:
-    """
-    Экспоненциальное взвешенное среднее (EWM).
-    Чем меньше alpha — тем больше вес далёкой истории (сглаживание тренда).
-    Подходит для долгосрочных прогнозов.
-    """
-    ewm = rates[0]
-    for r in rates[1:]:
-        ewm = alpha * r + (1 - alpha) * ewm
-    # Проецируем последний тренд вперёд
-    last_trend = rates[-1] - rates[-2] if len(rates) > 1 else 0
-    return float(ewm + last_trend * horizon_days * alpha)
-
-
-def _volatility(rates: list[float]) -> float:
-    """Стандартное отклонение дневных изменений (мера риска)."""
-    changes = [rates[i] - rates[i - 1] for i in range(1, len(rates))]
-    return float(np.std(changes))
-
-
-def _trend_strength(rates: list[float]) -> str:
-    """
-    Оценивает силу тренда за последние 30 дней.
-    Возвращает: STRONG_UP / WEAK_UP / FLAT / WEAK_DOWN / STRONG_DOWN
-    """
-    recent = rates[-30:]
-    total_change = recent[-1] - recent[0]
-    vol = _volatility(recent) or 0.001
-    ratio = total_change / vol  # отношение сигнала к шуму
-
-    if ratio > 2.0:
-        return "STRONG_UP"
-    elif ratio > 0.5:
-        return "WEAK_UP"
-    elif ratio < -2.0:
-        return "STRONG_DOWN"
-    elif ratio < -0.5:
-        return "WEAK_DOWN"
-    else:
-        return "FLAT"
-
-
-def _recommendation(
-    current_bank_buy: float,   # банк покупает у вас (вы продаёте)
-    current_bank_sell: float,  # банк продаёт вам (вы покупаете)
-    forecast_week: float,
-    forecast_month: float,
-    trend: str,
-) -> dict:
-    """
-    Генерирует торговую рекомендацию.
-    - Если курс прогнозируется ВЫШЕ текущего → выгоднее подождать с продажей.
-    - Если курс прогнозируется НИЖЕ → выгоднее продать сейчас.
-    """
-    rec = {}
-
-    # ПОКУПКА валюты (тратим BYN)
-    if forecast_week > current_bank_sell * 1.005:
-        rec["buy"] = ("⚡ ПОКУПАЙ СЕЙЧАС", "Прогноз роста. Сегодня дешевле, чем через неделю.")
-    elif forecast_week < current_bank_sell * 0.995:
-        rec["buy"] = ("⏳ ПОДОЖДИ", "Прогноз снижения. Через неделю может быть дешевле.")
-    else:
-        rec["buy"] = ("😐 НЕЙТРАЛЬНО", "Изменение незначительное. Покупай по необходимости.")
-
-    # ПРОДАЖА валюты (получаем BYN)
-    if forecast_week > current_bank_buy * 1.005:
-        rec["sell"] = ("⏳ ПОДОЖДИ", "Прогноз роста. Через неделю сдашь дороже.")
-    elif forecast_week < current_bank_buy * 0.995:
-        rec["sell"] = ("⚡ ПРОДАВАЙ СЕЙЧАС", "Прогноз снижения. Сегодня сдашь выгоднее.")
-    else:
-        rec["sell"] = ("😐 НЕЙТРАЛЬНО", "Изменение незначительное. Продавай по необходимости.")
-
-    return rec
-
+CACHE_FILE = "forecast_base_cache.json"
 
 TREND_LABELS = {
-    "STRONG_UP": "📈 Сильный рост",
-    "WEAK_UP": "↗️ Слабый рост",
-    "FLAT": "➡️ Боковик",
-    "WEAK_DOWN": "↘️ Слабое снижение",
-    "STRONG_DOWN": "📉 Сильное снижение",
+    "UP": "Уверенный рост 📈",
+    "DOWN": "Снижение 📉",
+    "STABLE": "Стабилен ➡️"
 }
 
 
-def predict_all(bank_rates: dict | None = None) -> dict:
+def _fetch_all_currencies_history(years: int = 3) -> dict | None:
     """
-    Главная функция. Возвращает прогноз для всех 4 валют.
-
-    bank_rates — словарь из get_best_rates_summary()["best"]:
-        {"USD": {"best_buy": ..., "best_sell": ..., ...}, ...}
+    Загружает историю котировок НБРБ порциями по 365 дней.
+    Ограничено 3 годами, так как CNY (юань) появился в корзине только в 2022 году.
     """
-    results = {}
+    data_all_raw = {cur: {} for cur in NBRB_IDS}
+    end_date = datetime.now()
 
-    for cur, cur_id in NBRB_IDS.items():
-        scale = SCALE[cur]
+    for i in range(years):
+        chunk_end = end_date - timedelta(days=i * 365)
+        chunk_start = chunk_end - timedelta(days=364)
 
-        rates = _fetch_nbrb_history(cur_id, days=365)
-        if not rates or len(rates) < 30:
-            continue
+        date_str = f"?startdate={chunk_start.strftime('%Y-%m-%d')}&enddate={chunk_end.strftime('%Y-%m-%d')}"
 
-        current = rates[-1]
-        vol = _volatility(rates)
-        trend = _trend_strength(rates)
+        for cur_name, cur_id in NBRB_IDS.items():
+            url = f"https://api.nbrb.by/exrates/rates/dynamics/{cur_id}{date_str}"
+            try:
+                resp = requests.get(url, timeout=10)
+                if resp.status_code == 200:
+                    json_data = resp.json()
+                    if json_data:
+                        scale = float(SCALE[cur_name])
+                        for item in json_data:
+                            d = item["Date"][:10]
+                            data_all_raw[cur_name][d] = float(item['Cur_OfficialRate']) / scale
+                elif i == 0:
+                    # Если упал самый первый (текущий) год — это реальная проблема с API
+                    return None
+            except Exception:
+                if i == 0:
+                    return None
+        time.sleep(0.05)
 
-        # Прогнозы (линейная регрессия + EWM → усредняем)
-        horizons = {
-            "week": 7,
-            "month": 30,
-            "year": 365,
-            "years5": 365 * 5,
-        }
-        forecasts = {}
-        for label, h in horizons.items():
-            lr = _linear_regression_forecast(rates, h)
-            ewm = _ewm_forecast(rates, h)
-            # Чем дальше горизонт — тем больше вес EWM (он устойчивее к выбросам)
-            weight_ewm = min(0.3 + h / 1000, 0.7)
-            blended = lr * (1 - weight_ewm) + ewm * weight_ewm
-            forecasts[label] = round(blended, 4)
+    data_final = {}
+    for cur_name in NBRB_IDS:
+        sorted_dates = sorted(data_all_raw[cur_name].keys())
+        if not sorted_dates:
+            return None
+        data_final[cur_name] = [data_all_raw[cur_name][d] for d in sorted_dates]
 
-        # Направление тренда иконкой
-        icon = "📈" if "UP" in trend else ("📉" if "DOWN" in trend else "➡️")
+    if len(data_final) < len(NBRB_IDS):
+        return None
 
-        # Рекомендация — строится по банковским курсам (если переданы)
+    # Синхронизируем массивы по минимальной длине
+    min_len = min(len(v) for v in data_final.values())
+    if min_len < 30:
+        return None
+
+    for k in data_final:
+        data_final[k] = data_final[k][-min_len:]
+
+    return data_final
+
+
+def _hurwitz_decision_engine(bank_rate: float, pred_week: float, pred_month: float, vol: float, is_buy: bool) -> tuple[
+    str, str]:
+    """Матричный движок Гурвица для принятия решений в условиях риска"""
+    expected_future = (pred_week * 0.6) + (pred_month * 0.4)
+    risk_premium = vol * 1.96
+    market_states = [expected_future - risk_premium, expected_future, expected_future + risk_premium]
+    gamma = 0.35
+
+    if is_buy:
+        utility_act = [state - bank_rate for state in market_states]
+        utility_wait = [0.0, 0.0, 0.0]
+        h_act = gamma * min(utility_act) + (1.0 - gamma) * max(utility_act)
+        h_wait = gamma * min(utility_wait) + (1.0 - gamma) * max(utility_wait)
+
+        if h_act > 0.005:
+            return "🔥 РЕКОМЕНДУЕТСЯ", f"Критерий Гурвица ({h_act:.4f} > {h_wait:.4f}). Риск оправдан, покупка целесообразна."
+        elif h_act < -0.005:
+            return "⏳ ПОДОЖДАТЬ", f"Матрица рисков указывает на высокую неопределенность. Лучше отложить покупку."
+        else:
+            return "⚖️ НЕЙТРАЛЬНО", "Математическое ожидание исходов находится в точке равновесия рынка."
+
+    else:
+        utility_act = [bank_rate - state for state in market_states]
+        utility_wait = [0.0, 0.0, 0.0]
+        h_act = gamma * min(utility_act) + (1.0 - gamma) * max(utility_act)
+        h_wait = gamma * min(utility_wait) + (1.0 - gamma) * max(utility_wait)
+
+        if h_act > 0.005:
+            return "💰 ВЫГОДНО", f"Критерий Гурвица ({h_act:.4f} > {h_wait:.4f}). Выгодно зафиксировать прибыль сейчас."
+        elif h_act < -0.005:
+            return "⏳ ПОДОЖДАТЬ", f"Потенциал долгосрочного роста перевешивает риски. Разумнее придержать валюту."
+        else:
+            return "⚖️ НЕЙТРАЛЬНО", "Решение находится в зоне рыночной эффективности, явных аномалий не обнаружено."
+
+
+def predict_all(bank_rates: Optional[dict] = None) -> dict:
+    """
+    Главная точка расчета. Поддерживает суточное кэширование базовой ML-модели.
+    """
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    base_results = None
+
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                cache_data = json.load(f)
+                if cache_data.get("date") == today_str:
+                    base_results = cache_data.get("results")
+        except Exception:
+            base_results = None
+
+    if not base_results:
+        base_results = {}
+        history = _fetch_all_currencies_history(3)  # Запрашиваем стабильные 3 года чанками
+
+        if not history:
+            print("⚠️ [ML Engine] API НБРБ недоступно. Пытаемся поднять прошлый кэш...")
+            if os.path.exists(CACHE_FILE):
+                try:
+                    with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                        base_results = json.load(f).get("results", {})
+                except Exception:
+                    pass
+            if not base_results:
+                return {}
+        else:
+            LAG_DAYS = 5
+            ALPHA_RIDGE = 0.25
+            horizons = {"week": 7, "month": 30, "year": 365, "years5": 1825}
+            max_steps = max(horizons.values())
+
+            for cur in NBRB_IDS.keys():
+                scale = SCALE[cur]
+                seq = history[cur]
+                current_in_units = seq[-1]
+                hist_mean = float(np.mean(seq))
+                vol_daily_unit = float(np.std(np.diff(seq)))
+
+                X, Y = [], []
+                for t in range(LAG_DAYS, len(seq) - 1):
+                    row = [seq[t - i] for i in range(LAG_DAYS)]
+                    row.append(1.0)
+                    X.append(row)
+                    Y.append(seq[t + 1])
+
+                X = np.array(X)
+                Y = np.array(Y)
+
+                I = np.eye(X.shape[1])
+                W = np.linalg.inv(X.T @ X + ALPHA_RIDGE * I) @ X.T @ Y
+
+                current_lags = list(seq[-LAG_DAYS:])
+                predictions_steps = []
+
+                for step in range(1, max_steps + 1):
+                    feat_row = current_lags[::-1] + [1.0]
+                    pred_raw = float(np.dot(feat_row, W))
+                    decay = 0.996 ** step
+                    pred_final = pred_raw * decay + hist_mean * (1.0 - decay)
+
+                    predictions_steps.append(pred_final)
+                    current_lags.pop(0)
+                    current_lags.append(pred_final)
+
+                forecasts = {
+                    "week": round(predictions_steps[horizons["week"] - 1] * scale, 4),
+                    "month": round(predictions_steps[horizons["month"] - 1] * scale, 4),
+                    "year": round(predictions_steps[horizons["year"] - 1] * scale, 4),
+                    "years5": round(predictions_steps[horizons["years5"] - 1] * scale, 4)
+                }
+
+                if forecasts["week"] / scale > current_in_units + 0.001:
+                    trend = "UP"
+                elif forecasts["week"] / scale < current_in_units - 0.001:
+                    trend = "DOWN"
+                else:
+                    trend = "STABLE"
+
+                icon = "📈" if trend == "UP" else ("📉" if trend == "DOWN" else "➡️")
+
+                base_results[cur] = {
+                    "current_nbrb": round(current_in_units * scale, 4),
+                    "scale": scale,
+                    "forecasts": forecasts,
+                    "volatility_daily": round(vol_daily_unit * scale, 5),
+                    "trend": trend,
+                    "trend_label": TREND_LABELS[trend],
+                    "trend_icon": icon,
+                    "recent_vol_unit": float(np.std(np.diff(seq[-30:])))
+                }
+
+            try:
+                with open(CACHE_FILE, "w", encoding="utf-8") as f:
+                    json.dump({"date": today_str, "results": base_results}, f, ensure_ascii=False, indent=2)
+                print(f"💾 [ML Engine] Актуальный ИИ-прогноз успешно закэширован на дату {today_str}")
+            except Exception as e:
+                print(f"⚠️ Ошибка сохранения кэша прогнозов: {e}")
+
+    final_results = {}
+    for cur, data in base_results.items():
+        final_results[cur] = dict(data)
         rec = {}
+
         if bank_rates and cur in bank_rates:
             b = bank_rates[cur]
-            buy_rate = b.get("best_buy", 0) / scale  # в единицах НБРБ
+            scale = data["scale"]
+            buy_rate = b.get("best_buy", 0) / scale
             sell_rate = b.get("best_sell", 0) / scale
+
             if buy_rate > 0 and sell_rate > 0:
-                rec = _recommendation(
-                    buy_rate, sell_rate,
-                    forecasts["week"], forecasts["month"],
-                    trend
-                )
+                recent_vol = data.get("recent_vol_unit", data["volatility_daily"] / scale)
+                forecasts = data["forecasts"]
 
-        results[cur] = {
-            "current_nbrb": round(current, 4),      # официальный курс НБРБ сегодня
-            "scale": scale,                          # единиц иностранной за 1 котировку
-            "forecasts": forecasts,                  # {"week": ..., "month": ..., ...}
-            "volatility_daily": round(vol, 5),       # ср. дневное колебание BYN
-            "trend": trend,
-            "trend_label": TREND_LABELS[trend],
-            "trend_icon": icon,
-            "recommendation": rec,                   # {"buy": (label, desc), "sell": (label, desc)}
-            "history_days": len(rates),
-        }
+                buy_signal = _hurwitz_decision_engine(sell_rate, forecasts["week"] / scale, forecasts["month"] / scale,
+                                                      recent_vol, is_buy=True)
+                sell_signal = _hurwitz_decision_engine(buy_rate, forecasts["week"] / scale, forecasts["month"] / scale,
+                                                       recent_vol, is_buy=False)
 
-    return results
+                rec = {"buy": buy_signal, "sell": sell_signal}
+
+        final_results[cur]["recommendation"] = rec
+        if "recent_vol_unit" in final_results[cur]:
+            del final_results[cur]["recent_vol_unit"]
+
+    return final_results

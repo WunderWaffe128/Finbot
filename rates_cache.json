@@ -3,220 +3,220 @@
     "data": {
       "best": {
         "USD": {
-          "best_buy": 2.81,
+          "best_buy": 2.837,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 2.805,
-          "best_sell_bank": "Сбер Банк"
+          "best_sell": 2.848,
+          "best_sell_bank": "БНБ-Банк"
         },
         "EUR": {
-          "best_buy": 3.325,
+          "best_buy": 3.305,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.33,
+          "best_sell": 3.319,
           "best_sell_bank": "БНБ-Банк"
         },
         "RUB": {
-          "best_buy": 3.835,
+          "best_buy": 3.72,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.837,
+          "best_sell": 3.795,
           "best_sell_bank": "БНБ-Банк"
         },
         "CNY": {
-          "best_buy": 4.07,
+          "best_buy": 4.11,
           "best_buy_bank": "Беларусбанк",
-          "best_sell": 4.35,
+          "best_sell": 4.46,
           "best_sell_bank": "Беларусбанк"
         }
       },
       "all_banks": {
         "БНБ-Банк": {
-          "USD_in": 2.81,
-          "USD_out": 2.818,
-          "EUR_in": 3.325,
-          "EUR_out": 3.33,
-          "RUB_in": 3.835,
-          "RUB_out": 3.837
+          "USD_in": 2.837,
+          "USD_out": 2.848,
+          "EUR_in": 3.305,
+          "EUR_out": 3.319,
+          "RUB_in": 3.72,
+          "RUB_out": 3.795
         },
         "Альфа Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.845,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.825,
-          "RUB_out": 3.875
+          "USD_in": 2.834,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.85
         },
         "Белагропромбанк": {
-          "USD_in": 2.79,
-          "USD_out": 2.82,
-          "EUR_in": 3.305,
-          "EUR_out": 3.34,
-          "RUB_in": 3.835,
-          "RUB_out": 3.845
+          "USD_in": 2.829,
+          "USD_out": 2.85,
+          "EUR_in": 3.289,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.805
         },
         "Белинвестбанк": {
-          "USD_in": 2.797,
-          "USD_out": 2.825,
-          "EUR_in": 3.3,
-          "EUR_out": 3.34,
-          "RUB_in": 3.815,
-          "RUB_out": 3.85
+          "USD_in": 2.835,
+          "USD_out": 2.853,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.71,
+          "RUB_out": 3.8
         },
         "МТБанк": {
-          "USD_in": 2.79,
-          "USD_out": 2.82,
-          "EUR_in": 3.28,
-          "EUR_out": 3.34,
-          "RUB_in": 3.82,
-          "RUB_out": 3.85
+          "USD_in": 2.82,
+          "USD_out": 2.85,
+          "EUR_in": 3.285,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.81
         },
         "Приорбанк": {
-          "USD_in": 2.74,
-          "USD_out": 2.83,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.8,
-          "RUB_out": 3.875
+          "USD_in": 2.82,
+          "USD_out": 2.85,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
         },
         "Сбер Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.805,
-          "EUR_in": 3.28,
-          "EUR_out": 3.345,
-          "RUB_in": 3.81,
-          "RUB_out": 3.89
+          "USD_in": 2.81,
+          "USD_out": 2.854,
+          "EUR_in": 3.275,
+          "EUR_out": 3.32,
+          "RUB_in": 3.66,
+          "RUB_out": 3.83
         },
         "Беларусбанк": {
-          "USD_in": 2.78,
-          "USD_out": 2.825,
-          "EUR_in": 3.25,
-          "EUR_out": 3.33,
-          "RUB_in": 3.78,
-          "RUB_out": 3.84,
-          "CNY_in": 4.07,
-          "CNY_out": 4.35
+          "USD_in": 2.83,
+          "USD_out": 2.85,
+          "EUR_in": 3.3,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.805,
+          "CNY_in": 4.11,
+          "CNY_out": 4.46
         }
       }
     },
-    "updated_at": "2026-05-22 09:41:34"
+    "updated_at": "2026-06-02 17:37:10"
   },
   "gomel": {
     "data": {
       "best": {
         "USD": {
-          "best_buy": 2.805,
+          "best_buy": 2.837,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 2.805,
-          "best_sell_bank": "Сбер Банк"
+          "best_sell": 2.85,
+          "best_sell_bank": "БНБ-Банк"
         },
         "EUR": {
-          "best_buy": 3.325,
+          "best_buy": 3.302,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.33,
-          "best_sell_bank": "Беларусбанк"
+          "best_sell": 3.32,
+          "best_sell_bank": "БНБ-Банк"
         },
         "RUB": {
-          "best_buy": 3.835,
+          "best_buy": 3.711,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.84,
-          "best_sell_bank": "МТБанк"
+          "best_sell": 3.8,
+          "best_sell_bank": "БНБ-Банк"
         },
         "CNY": {
-          "best_buy": 4.07,
+          "best_buy": 4.11,
           "best_buy_bank": "Беларусбанк",
-          "best_sell": 4.35,
+          "best_sell": 4.46,
           "best_sell_bank": "Беларусбанк"
         }
       },
       "all_banks": {
         "БНБ-Банк": {
-          "USD_in": 2.805,
-          "USD_out": 2.818,
-          "EUR_in": 3.325,
-          "EUR_out": 3.34,
-          "RUB_in": 3.835,
-          "RUB_out": 3.855
+          "USD_in": 2.837,
+          "USD_out": 2.85,
+          "EUR_in": 3.302,
+          "EUR_out": 3.32,
+          "RUB_in": 3.711,
+          "RUB_out": 3.8
         },
         "Альфа Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.845,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.825,
-          "RUB_out": 3.875
-        },
-        "Белагропромбанк": {
-          "USD_in": 2.73,
-          "USD_out": 2.845,
-          "EUR_in": 3.175,
-          "EUR_out": 3.35,
-          "RUB_in": 3.82,
-          "RUB_out": 3.875
-        },
-        "Белинвестбанк": {
-          "USD_in": 2.797,
-          "USD_out": 2.825,
-          "EUR_in": 3.3,
-          "EUR_out": 3.34,
-          "RUB_in": 3.815,
+          "USD_in": 2.834,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
           "RUB_out": 3.85
         },
-        "МТБанк": {
-          "USD_in": 2.79,
-          "USD_out": 2.825,
+        "Белагропромбанк": {
+          "USD_in": 2.829,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
+        },
+        "Белинвестбанк": {
+          "USD_in": 2.835,
+          "USD_out": 2.853,
           "EUR_in": 3.27,
-          "EUR_out": 3.35,
-          "RUB_in": 3.77,
-          "RUB_out": 3.84
+          "EUR_out": 3.32,
+          "RUB_in": 3.71,
+          "RUB_out": 3.8
+        },
+        "МТБанк": {
+          "USD_in": 2.825,
+          "USD_out": 2.855,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.67,
+          "RUB_out": 3.81
         },
         "Приорбанк": {
-          "USD_in": 2.74,
-          "USD_out": 2.83,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.8,
-          "RUB_out": 3.875
+          "USD_in": 2.82,
+          "USD_out": 2.85,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
         },
         "Сбер Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.805,
+          "USD_in": 2.81,
+          "USD_out": 2.854,
           "EUR_in": 3.275,
-          "EUR_out": 3.345,
-          "RUB_in": 3.81,
-          "RUB_out": 3.89
+          "EUR_out": 3.32,
+          "RUB_in": 3.66,
+          "RUB_out": 3.83
         },
         "Беларусбанк": {
-          "USD_in": 2.78,
-          "USD_out": 2.825,
-          "EUR_in": 3.25,
-          "EUR_out": 3.33,
-          "RUB_in": 3.78,
-          "RUB_out": 3.84,
-          "CNY_in": 4.07,
-          "CNY_out": 4.35
+          "USD_in": 2.83,
+          "USD_out": 2.85,
+          "EUR_in": 3.3,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.805,
+          "CNY_in": 4.11,
+          "CNY_out": 4.46
         }
       }
     },
-    "updated_at": "2026-05-22 09:41:36"
+    "updated_at": "2026-06-02 17:37:12"
   },
   "brest": {
     "data": {
       "best": {
         "USD": {
-          "best_buy": 2.805,
+          "best_buy": 2.837,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 2.805,
-          "best_sell_bank": "Сбер Банк"
+          "best_sell": 2.848,
+          "best_sell_bank": "БНБ-Банк"
         },
         "EUR": {
-          "best_buy": 3.325,
+          "best_buy": 3.302,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.33,
-          "best_sell_bank": "Белагропромбанк"
+          "best_sell": 3.32,
+          "best_sell_bank": "Альфа Банк"
         },
         "RUB": {
-          "best_buy": 3.835,
+          "best_buy": 3.711,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.84,
-          "best_sell_bank": "Беларусбанк"
+          "best_sell": 3.8,
+          "best_sell_bank": "БНБ-Банк"
         },
         "CNY": {
           "best_buy": -1.0,
@@ -227,370 +227,370 @@
       },
       "all_banks": {
         "БНБ-Банк": {
-          "USD_in": 2.805,
-          "USD_out": 2.818,
-          "EUR_in": 3.325,
-          "EUR_out": 3.34,
-          "RUB_in": 3.835,
-          "RUB_out": 3.855
+          "USD_in": 2.837,
+          "USD_out": 2.848,
+          "EUR_in": 3.302,
+          "EUR_out": 3.339,
+          "RUB_in": 3.711,
+          "RUB_out": 3.8
         },
         "Альфа Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.845,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.825,
-          "RUB_out": 3.875
+          "USD_in": 2.834,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.85
         },
         "Белагропромбанк": {
-          "USD_in": 2.728,
-          "USD_out": 2.828,
-          "EUR_in": 3.172,
-          "EUR_out": 3.33,
-          "RUB_in": 3.79,
-          "RUB_out": 3.87
+          "USD_in": 2.829,
+          "USD_out": 2.853,
+          "EUR_in": 3.289,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.805
         },
         "Белинвестбанк": {
-          "USD_in": 2.797,
-          "USD_out": 2.825,
-          "EUR_in": 3.3,
-          "EUR_out": 3.34,
-          "RUB_in": 3.815,
-          "RUB_out": 3.85
+          "USD_in": 2.835,
+          "USD_out": 2.853,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.71,
+          "RUB_out": 3.8
         },
         "МТБанк": {
-          "USD_in": 2.785,
-          "USD_out": 2.835,
-          "EUR_in": 3.25,
-          "EUR_out": 3.34,
-          "RUB_in": 3.78,
-          "RUB_out": 3.85
+          "USD_in": 2.82,
+          "USD_out": 2.855,
+          "EUR_in": 3.26,
+          "EUR_out": 3.32,
+          "RUB_in": 3.68,
+          "RUB_out": 3.815
         },
         "Приорбанк": {
-          "USD_in": 2.74,
-          "USD_out": 2.83,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.8,
-          "RUB_out": 3.875
+          "USD_in": 2.82,
+          "USD_out": 2.85,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
         },
         "Сбер Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.805,
+          "USD_in": 2.81,
+          "USD_out": 2.854,
           "EUR_in": 3.275,
-          "EUR_out": 3.345,
-          "RUB_in": 3.81,
-          "RUB_out": 3.89
+          "EUR_out": 3.32,
+          "RUB_in": 3.66,
+          "RUB_out": 3.83
         },
         "Беларусбанк": {
-          "USD_in": 2.76,
-          "USD_out": 2.825,
-          "EUR_in": 3.22,
-          "EUR_out": 3.33,
-          "RUB_in": 3.77,
-          "RUB_out": 3.84,
+          "USD_in": 2.81,
+          "USD_out": 2.85,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.64,
+          "RUB_out": 3.805,
           "CNY_in": 0.0,
           "CNY_out": 0.0
         }
       }
     },
-    "updated_at": "2026-05-22 09:41:38"
+    "updated_at": "2026-06-02 17:37:14"
   },
   "grodno": {
     "data": {
       "best": {
         "USD": {
-          "best_buy": 2.805,
+          "best_buy": 2.837,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 2.817,
-          "best_sell_bank": "Сбер Банк"
+          "best_sell": 2.848,
+          "best_sell_bank": "БНБ-Банк"
         },
         "EUR": {
-          "best_buy": 3.325,
+          "best_buy": 3.302,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.33,
-          "best_sell_bank": "Беларусбанк"
+          "best_sell": 3.32,
+          "best_sell_bank": "БНБ-Банк"
         },
         "RUB": {
-          "best_buy": 3.836,
-          "best_buy_bank": "Белагропромбанк",
-          "best_sell": 3.84,
-          "best_sell_bank": "Беларусбанк"
+          "best_buy": 3.711,
+          "best_buy_bank": "БНБ-Банк",
+          "best_sell": 3.8,
+          "best_sell_bank": "БНБ-Банк"
         },
         "CNY": {
-          "best_buy": 4.07,
+          "best_buy": 4.11,
           "best_buy_bank": "Беларусбанк",
-          "best_sell": 4.35,
+          "best_sell": 4.46,
           "best_sell_bank": "Беларусбанк"
         }
       },
       "all_banks": {
         "БНБ-Банк": {
-          "USD_in": 2.805,
-          "USD_out": 2.818,
-          "EUR_in": 3.325,
-          "EUR_out": 3.34,
-          "RUB_in": 3.835,
-          "RUB_out": 3.855
+          "USD_in": 2.837,
+          "USD_out": 2.848,
+          "EUR_in": 3.302,
+          "EUR_out": 3.32,
+          "RUB_in": 3.711,
+          "RUB_out": 3.8
         },
         "Альфа Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.845,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.825,
-          "RUB_out": 3.875
+          "USD_in": 2.834,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.85
         },
         "Белагропромбанк": {
-          "USD_in": 2.771,
-          "USD_out": 2.825,
-          "EUR_in": 3.241,
-          "EUR_out": 3.34,
-          "RUB_in": 3.836,
-          "RUB_out": 3.875
+          "USD_in": 2.829,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
         },
         "Белинвестбанк": {
-          "USD_in": 2.797,
-          "USD_out": 2.825,
-          "EUR_in": 3.3,
-          "EUR_out": 3.34,
-          "RUB_in": 3.815,
-          "RUB_out": 3.85
+          "USD_in": 2.835,
+          "USD_out": 2.853,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.71,
+          "RUB_out": 3.8
         },
         "МТБанк": {
-          "USD_in": 2.785,
-          "USD_out": 2.835,
-          "EUR_in": 3.25,
-          "EUR_out": 3.34,
-          "RUB_in": 3.78,
-          "RUB_out": 3.85
+          "USD_in": 2.82,
+          "USD_out": 2.855,
+          "EUR_in": 3.26,
+          "EUR_out": 3.32,
+          "RUB_in": 3.68,
+          "RUB_out": 3.815
         },
         "Приорбанк": {
-          "USD_in": 2.74,
-          "USD_out": 2.83,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.8,
-          "RUB_out": 3.875
+          "USD_in": 2.82,
+          "USD_out": 2.85,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
         },
         "Сбер Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.817,
+          "USD_in": 2.81,
+          "USD_out": 2.854,
           "EUR_in": 3.275,
-          "EUR_out": 3.345,
-          "RUB_in": 3.81,
-          "RUB_out": 3.89
+          "EUR_out": 3.32,
+          "RUB_in": 3.66,
+          "RUB_out": 3.83
         },
         "Беларусбанк": {
-          "USD_in": 2.78,
-          "USD_out": 2.825,
-          "EUR_in": 3.25,
-          "EUR_out": 3.33,
-          "RUB_in": 3.78,
-          "RUB_out": 3.84,
-          "CNY_in": 4.07,
-          "CNY_out": 4.35
+          "USD_in": 2.83,
+          "USD_out": 2.85,
+          "EUR_in": 3.3,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.805,
+          "CNY_in": 4.11,
+          "CNY_out": 4.46
         }
       }
     },
-    "updated_at": "2026-05-22 09:41:40"
+    "updated_at": "2026-06-02 17:37:16"
   },
   "mogilev": {
     "data": {
       "best": {
         "USD": {
-          "best_buy": 2.8025,
+          "best_buy": 2.8375,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 2.805,
-          "best_sell_bank": "Сбер Банк"
+          "best_sell": 2.848,
+          "best_sell_bank": "БНБ-Банк"
         },
         "EUR": {
-          "best_buy": 3.3105,
+          "best_buy": 3.3015,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.33,
-          "best_sell_bank": "Беларусбанк"
+          "best_sell": 3.319,
+          "best_sell_bank": "БНБ-Банк"
         },
         "RUB": {
-          "best_buy": 3.835,
+          "best_buy": 3.711,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.84,
-          "best_sell_bank": "МТБанк"
+          "best_sell": 3.8,
+          "best_sell_bank": "БНБ-Банк"
         },
         "CNY": {
-          "best_buy": 4.07,
+          "best_buy": 4.11,
           "best_buy_bank": "Беларусбанк",
-          "best_sell": 4.35,
+          "best_sell": 4.46,
           "best_sell_bank": "Беларусбанк"
         }
       },
       "all_banks": {
         "БНБ-Банк": {
-          "USD_in": 2.8025,
-          "USD_out": 2.818,
-          "EUR_in": 3.3105,
-          "EUR_out": 3.34,
-          "RUB_in": 3.835,
-          "RUB_out": 3.855
+          "USD_in": 2.8375,
+          "USD_out": 2.848,
+          "EUR_in": 3.3015,
+          "EUR_out": 3.319,
+          "RUB_in": 3.711,
+          "RUB_out": 3.8
         },
         "Альфа Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.845,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.825,
-          "RUB_out": 3.875
-        },
-        "Белагропромбанк": {
-          "USD_in": 2.745,
-          "USD_out": 2.845,
-          "EUR_in": 3.2,
-          "EUR_out": 3.35,
-          "RUB_in": 3.832,
-          "RUB_out": 3.86
-        },
-        "Белинвестбанк": {
-          "USD_in": 2.797,
-          "USD_out": 2.825,
-          "EUR_in": 3.3,
-          "EUR_out": 3.34,
-          "RUB_in": 3.815,
+          "USD_in": 2.834,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
           "RUB_out": 3.85
         },
-        "МТБанк": {
-          "USD_in": 2.79,
-          "USD_out": 2.825,
+        "Белагропромбанк": {
+          "USD_in": 2.829,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
+        },
+        "Белинвестбанк": {
+          "USD_in": 2.835,
+          "USD_out": 2.853,
           "EUR_in": 3.27,
-          "EUR_out": 3.35,
-          "RUB_in": 3.77,
-          "RUB_out": 3.84
+          "EUR_out": 3.32,
+          "RUB_in": 3.71,
+          "RUB_out": 3.8
+        },
+        "МТБанк": {
+          "USD_in": 2.825,
+          "USD_out": 2.855,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.67,
+          "RUB_out": 3.81
         },
         "Приорбанк": {
-          "USD_in": 2.74,
-          "USD_out": 2.83,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.8,
-          "RUB_out": 3.875
+          "USD_in": 2.82,
+          "USD_out": 2.85,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
         },
         "Сбер Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.805,
+          "USD_in": 2.81,
+          "USD_out": 2.854,
           "EUR_in": 3.275,
-          "EUR_out": 3.345,
-          "RUB_in": 3.81,
-          "RUB_out": 3.89
+          "EUR_out": 3.32,
+          "RUB_in": 3.66,
+          "RUB_out": 3.83
         },
         "Беларусбанк": {
-          "USD_in": 2.78,
-          "USD_out": 2.825,
-          "EUR_in": 3.25,
-          "EUR_out": 3.33,
-          "RUB_in": 3.78,
-          "RUB_out": 3.84,
-          "CNY_in": 4.07,
-          "CNY_out": 4.35
+          "USD_in": 2.83,
+          "USD_out": 2.85,
+          "EUR_in": 3.3,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.805,
+          "CNY_in": 4.11,
+          "CNY_out": 4.46
         }
       }
     },
-    "updated_at": "2026-05-22 09:41:42"
+    "updated_at": "2026-06-02 17:37:18"
   },
   "vitebsk": {
     "data": {
       "best": {
         "USD": {
-          "best_buy": 2.8025,
+          "best_buy": 2.8375,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 2.805,
-          "best_sell_bank": "Сбер Банк"
+          "best_sell": 2.8495,
+          "best_sell_bank": "БНБ-Банк"
         },
         "EUR": {
-          "best_buy": 3.3205,
+          "best_buy": 3.3015,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.329,
-          "best_sell_bank": "Белагропромбанк"
+          "best_sell": 3.3195,
+          "best_sell_bank": "БНБ-Банк"
         },
         "RUB": {
-          "best_buy": 3.835,
+          "best_buy": 3.711,
           "best_buy_bank": "БНБ-Банк",
-          "best_sell": 3.84,
-          "best_sell_bank": "МТБанк"
+          "best_sell": 3.8,
+          "best_sell_bank": "БНБ-Банк"
         },
         "CNY": {
-          "best_buy": 4.07,
+          "best_buy": 4.11,
           "best_buy_bank": "Беларусбанк",
-          "best_sell": 4.35,
+          "best_sell": 4.46,
           "best_sell_bank": "Беларусбанк"
         }
       },
       "all_banks": {
         "БНБ-Банк": {
-          "USD_in": 2.8025,
-          "USD_out": 2.818,
-          "EUR_in": 3.3205,
-          "EUR_out": 3.34,
-          "RUB_in": 3.835,
-          "RUB_out": 3.855
+          "USD_in": 2.8375,
+          "USD_out": 2.8495,
+          "EUR_in": 3.3015,
+          "EUR_out": 3.3195,
+          "RUB_in": 3.711,
+          "RUB_out": 3.8
         },
         "Альфа Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.845,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.825,
-          "RUB_out": 3.875
-        },
-        "Белагропромбанк": {
-          "USD_in": 2.727,
-          "USD_out": 2.836,
-          "EUR_in": 3.161,
-          "EUR_out": 3.329,
-          "RUB_in": 3.825,
-          "RUB_out": 3.87
-        },
-        "Белинвестбанк": {
-          "USD_in": 2.797,
-          "USD_out": 2.825,
-          "EUR_in": 3.3,
-          "EUR_out": 3.34,
-          "RUB_in": 3.815,
+          "USD_in": 2.834,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
           "RUB_out": 3.85
         },
-        "МТБанк": {
-          "USD_in": 2.79,
-          "USD_out": 2.825,
+        "Белагропромбанк": {
+          "USD_in": 2.829,
+          "USD_out": 2.85,
+          "EUR_in": 3.28,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
+        },
+        "Белинвестбанк": {
+          "USD_in": 2.835,
+          "USD_out": 2.853,
           "EUR_in": 3.27,
-          "EUR_out": 3.35,
-          "RUB_in": 3.77,
-          "RUB_out": 3.84
+          "EUR_out": 3.32,
+          "RUB_in": 3.71,
+          "RUB_out": 3.8
+        },
+        "МТБанк": {
+          "USD_in": 2.825,
+          "USD_out": 2.855,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.67,
+          "RUB_out": 3.81
         },
         "Приорбанк": {
-          "USD_in": 2.74,
-          "USD_out": 2.83,
-          "EUR_in": 3.18,
-          "EUR_out": 3.34,
-          "RUB_in": 3.8,
-          "RUB_out": 3.875
+          "USD_in": 2.82,
+          "USD_out": 2.85,
+          "EUR_in": 3.27,
+          "EUR_out": 3.32,
+          "RUB_in": 3.7,
+          "RUB_out": 3.83
         },
         "Сбер Банк": {
-          "USD_in": 2.745,
-          "USD_out": 2.805,
+          "USD_in": 2.81,
+          "USD_out": 2.854,
           "EUR_in": 3.275,
-          "EUR_out": 3.345,
-          "RUB_in": 3.81,
-          "RUB_out": 3.89
+          "EUR_out": 3.32,
+          "RUB_in": 3.66,
+          "RUB_out": 3.83
         },
         "Беларусбанк": {
-          "USD_in": 2.78,
-          "USD_out": 2.825,
-          "EUR_in": 3.25,
-          "EUR_out": 3.33,
-          "RUB_in": 3.78,
-          "RUB_out": 3.84,
-          "CNY_in": 4.07,
-          "CNY_out": 4.35
+          "USD_in": 2.83,
+          "USD_out": 2.85,
+          "EUR_in": 3.3,
+          "EUR_out": 3.32,
+          "RUB_in": 3.65,
+          "RUB_out": 3.805,
+          "CNY_in": 4.11,
+          "CNY_out": 4.46
         }
       }
     },
-    "updated_at": "2026-05-22 09:41:44"
+    "updated_at": "2026-06-02 17:37:20"
   }
 }
