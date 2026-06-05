@@ -1,11 +1,25 @@
-# main.py
+import asyncio
+import sys
+
+# === ФИКС ДЛЯ PYTHON 3.14 НА RENDER ===
+# Принудительно создаём event loop перед запуском бота
+if sys.version_info >= (3, 14):
+    try:
+        # Пытаемся получить текущий loop
+        asyncio.get_running_loop()
+    except RuntimeError:
+        # Если loop не запущен (а это наш случай), создаём новый и устанавливаем его
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+# === КОНЕЦ ФИКСА ===
+
+# Теперь все обычные импорты
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from bot_config import BOT_TOKEN
 from handlers import start, handle_number
 from scheduler import setup_scheduler
 from api_client import refresh_all_cities_cache
 from rate_cache import get_cache_age_minutes
-
 
 async def post_init(application: Application):
     """
