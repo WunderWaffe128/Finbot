@@ -1,7 +1,8 @@
-python-telegram-bot==21.1.1
+python-telegram-bot==21.10
 requests==2.31.0
 beautifulsoup4==4.12.3
 numpy==1.26.4
 apscheduler==3.10.4
 pytz==2024.1
 python-dotenv==1.0.0
+
