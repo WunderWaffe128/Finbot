@@ -1,6 +1,10 @@
 # bot_config.py
 
-BOT_TOKEN = ""
+load_dotenv()
+
+# load token from env
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+
 USERS_FILE = "users.txt"
 LOG_FILE = "bot.log.txt"
 
