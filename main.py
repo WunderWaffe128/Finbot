@@ -46,7 +46,13 @@ async def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_number))
     
-    await app.run_polling()
+    # Запускаем polling без дополнительного event loop
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+    
+    # Держим сервер запущенным
+    await asyncio.Event().wait()
 
 if __name__ == "__main__":
     asyncio.run(main())
